@@ -5,12 +5,12 @@
   "description": "Oh no! A Carminite Ghastguard steal your locomotives' power, all stock can not be accelerated too quickly by locomotives.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "simba98.github.com",
-  "updateUrl": "simba98.github.com",
-  "authorList": ["SimbaG"],
+  "url": "https://github.com/Simba98/Carminite_Ghastguard",
+  "updateUrl": "https://github.com/Simba98/Carminite_Ghastguard/releases",
+  "authorList": ["Simba98"],
   "credits": "Oh no! A Carminite Ghastguard steal your locomotives' power, all stock can not be accelerated too quickly by locomotives.",
   "logoFile": "assets/icon.png",
   "screenshots": [],
-  "dependencies": ["after:immersiverailroading"]
+  "dependencies": ["before:immersiverailroading"]
 }
 ]

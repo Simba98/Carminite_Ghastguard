@@ -23,18 +23,12 @@ public class ClassTransformer implements IClassTransformer {
             String methodName = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(name, mn.name, mn.desc);
             if(!"getVelocity".equals(methodName))
                 continue;
-
-            //TODO: 在这里进行ASM操作
             InsnList methodInstList = mn.instructions;
-
-
             AbstractInsnNode inst = methodInstList.getFirst();
             int num = methodInstList.size();
             for(int i = 0; i<num;i++){
-                System.out.println(inst.getOpcode());
                 if(inst instanceof FieldInsnNode) {
                     FieldInsnNode Finst1 = (FieldInsnNode)inst;
-                    System.out.println(Finst1.name);
                     // We expect Finst1 is getfield of tractiveEffortNewtons
                     // and Finst2 is getfield of massToMoveKg, which is two insts after finst1
                     // and Dinst1 is Op DDIV, which one inst after finst2
@@ -55,13 +49,58 @@ public class ClassTransformer implements IClassTransformer {
                                                 insertList.add(new MethodInsnNode(
                                                         Opcodes.INVOKESTATIC,
                                                         "com/github/simba98/Carminite_Ghastguard",
-                                                        "AccellLimit",
+                                                        "tractiveAccellLimit",
                                                         "(D)D",
                                                         false));
                                                 insertList.add(new VarInsnNode(Opcodes.DSTORE,varnumber));
 
                                                 methodInstList.insert(varinst,insertList);
-                                                break;
+                                                //break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // We expect Finst1 is getfield of brakeMultiplier
+                        // We save the var number of brakeMultiplier here
+                        int airBrakeNewtonsVarNumber = -1;
+                        if(Finst1.name.equals("brakeMultiplier")) {
+                            if(Finst1.getNext().getOpcode() == Opcodes.DMUL){
+                                if(Finst1.getPrevious().getOpcode() == Opcodes.DMUL) {
+                                    if (Finst1.getNext().getNext() instanceof VarInsnNode) {
+                                        // Save var number
+                                        VarInsnNode varinst = (VarInsnNode) Finst1.getNext().getNext();
+                                        airBrakeNewtonsVarNumber = varinst.var;
+                                    }
+                                }
+                            }
+                        }
+                        // We expect Finst1 is getfield of massToMoveKg
+                        // We expect two insts before is DLOAD of airBrakeNewtons
+                        if(Finst1.name.equals("massToMoveKg")) {
+                            if(Finst1.getPrevious().getPrevious().getOpcode() == Opcodes.DLOAD) {
+                                if(Finst1.getPrevious().getPrevious() instanceof VarInsnNode) {
+                                    // Check the var Number
+                                    VarInsnNode varinst1 = (VarInsnNode) Finst1.getPrevious().getPrevious();
+                                    if(airBrakeNewtonsVarNumber == varinst1.var) {
+                                        if (Finst1.getNext().getOpcode() == Opcodes.DDIV) {
+                                            if(Finst1.getNext().getNext() instanceof VarInsnNode) {
+                                                // Insert insts
+                                                VarInsnNode varinst2 = (VarInsnNode) Finst1.getNext().getNext();
+                                                int varnumber = varinst2.var;
+                                                InsnList insertList = new InsnList();
+                                                insertList.add(new VarInsnNode(Opcodes.DLOAD,varnumber));
+                                                insertList.add(new MethodInsnNode(
+                                                        Opcodes.INVOKESTATIC,
+                                                        "com/github/simba98/Carminite_Ghastguard",
+                                                        "brakeAccellLimit",
+                                                        "(D)D",
+                                                        false));
+                                                insertList.add(new VarInsnNode(Opcodes.DSTORE,varnumber));
+
+                                                methodInstList.insert(varinst2,insertList);
+                                                //break;
                                             }
                                         }
                                     }
@@ -70,8 +109,6 @@ public class ClassTransformer implements IClassTransformer {
                         }
                     }
                 }
-
-
                 inst = inst.getNext();
             }
             mn.visitEnd();
@@ -83,8 +120,4 @@ public class ClassTransformer implements IClassTransformer {
         return cw.toByteArray();
     }
 
-    public void Test () {
-        double acc = 5.0;
-        acc = Carminite_Ghastguard.AccellLimit(acc);
-    }
 }

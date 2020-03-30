@@ -98,7 +98,7 @@ processResources {
 jar {
     manifest {
         attributes([
-                "FMLCorePlugin": "com.github.simba98.ClassTransformer",
+                "FMLCorePlugin": "com.github.simba98.Carminite_Ghastguard",
                 "FMLCorePluginContainsFMLMod": true
         ])
     }

@@ -26,13 +26,18 @@ public class Carminite_Ghastguard implements IFMLLoadingPlugin {
         return null;
     }
 
-    static double MaxAccell = 0.5;
-    public static double AccellLimit(double originAccell) {
+    static double MaxtractiveAccell = 0.1;
+    public static double tractiveAccellLimit(double originTractiveAccell) {
         // System.out.println("Catched " + originAccell);
-        if (originAccell > MaxAccell) return MaxAccell;
-        if (originAccell < -MaxAccell) return -MaxAccell;
-        return originAccell;
+        if (originTractiveAccell > MaxtractiveAccell) return MaxtractiveAccell;
+        if (originTractiveAccell < -MaxtractiveAccell) return -MaxtractiveAccell;
+        return originTractiveAccell;
     }
 
-
+    static double MaxbrakeAccell = 0.25;
+    public static double brakeAccellLimit(double originBrakeAccell) {
+        if (originBrakeAccell > MaxbrakeAccell) return MaxbrakeAccell;
+        if (originBrakeAccell < -MaxbrakeAccell) return -MaxbrakeAccell;
+        return originBrakeAccell;
+    }
 }
