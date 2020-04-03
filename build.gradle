@@ -50,7 +50,7 @@ repositories {
     maven { url = "http://maven.cil.li/" }
 }
 dependencies {
-    deobfCompile "appeng:appliedenergistics2:rv6-stable-7"
+    //deobfCompile "appeng:appliedenergistics2:rv6-stable-7"
     deobfCompile "blusunrize:ImmersiveEngineering:0.12-92-555:deobf"
     compile fileTree(dir: 'lib', includes: ['*.jar']) 
     // you may put jars on which you depend on in ./libs

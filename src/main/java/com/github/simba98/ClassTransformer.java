@@ -26,13 +26,29 @@ public class ClassTransformer implements IClassTransformer {
             InsnList methodInstList = mn.instructions;
             AbstractInsnNode inst = methodInstList.getFirst();
             int num = methodInstList.size();
+            int airBrakeNewtonsVarNumber = -1;
             for(int i = 0; i<num;i++){
                 if(inst instanceof FieldInsnNode) {
                     FieldInsnNode Finst1 = (FieldInsnNode)inst;
+                    if(Finst1.getOpcode() == Opcodes.GETSTATIC) {
+                        if (Finst1.name.equals("brakeMultiplier")) {
+                            if (Finst1.getNext().getOpcode() == Opcodes.DMUL) {
+                                if (Finst1.getPrevious().getOpcode() == Opcodes.DMUL) {
+                                    if (Finst1.getNext().getNext() instanceof VarInsnNode) {
+                                        // Save var number
+                                        VarInsnNode varinst = (VarInsnNode) Finst1.getNext().getNext();
+                                        airBrakeNewtonsVarNumber = varinst.var;
+                                    }
+                                }
+                            }
+                        }
+                    }
                     // We expect Finst1 is getfield of tractiveEffortNewtons
                     // and Finst2 is getfield of massToMoveKg, which is two insts after finst1
                     // and Dinst1 is Op DDIV, which one inst after finst2
                     // After checking these insts, we get the var number of DSTORE inst and insert invoke opcodes
+                    // We expect Finst1 is getfield of brakeMultiplier
+                    // We save the var number of brakeMultiplier here
                     if(Finst1.getOpcode() == Opcodes.GETFIELD) {
                         if(Finst1.name.equals("tractiveEffortNewtons")) {
                             if(Finst1.getNext().getNext() instanceof FieldInsnNode){
@@ -53,25 +69,9 @@ public class ClassTransformer implements IClassTransformer {
                                                         "(D)D",
                                                         false));
                                                 insertList.add(new VarInsnNode(Opcodes.DSTORE,varnumber));
-
                                                 methodInstList.insert(varinst,insertList);
-                                                //break;
                                             }
                                         }
-                                    }
-                                }
-                            }
-                        }
-                        // We expect Finst1 is getfield of brakeMultiplier
-                        // We save the var number of brakeMultiplier here
-                        int airBrakeNewtonsVarNumber = -1;
-                        if(Finst1.name.equals("brakeMultiplier")) {
-                            if(Finst1.getNext().getOpcode() == Opcodes.DMUL){
-                                if(Finst1.getPrevious().getOpcode() == Opcodes.DMUL) {
-                                    if (Finst1.getNext().getNext() instanceof VarInsnNode) {
-                                        // Save var number
-                                        VarInsnNode varinst = (VarInsnNode) Finst1.getNext().getNext();
-                                        airBrakeNewtonsVarNumber = varinst.var;
                                     }
                                 }
                             }
@@ -98,9 +98,7 @@ public class ClassTransformer implements IClassTransformer {
                                                         "(D)D",
                                                         false));
                                                 insertList.add(new VarInsnNode(Opcodes.DSTORE,varnumber));
-
                                                 methodInstList.insert(varinst2,insertList);
-                                                //break;
                                             }
                                         }
                                     }

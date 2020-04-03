@@ -1,7 +1,7 @@
 [
 {
-  "modid": carminite_ghastguard",
-  "name": "Carminite Ghastguard",
+  "modid": "carminite_ghastguard_main",
+  "name": "Carminite Ghastguard Main",
   "description": "Oh no! A Carminite Ghastguard steal your locomotives' power, all stock can not be accelerated too quickly by locomotives.",
   "version": "${version}",
   "mcversion": "${mcversion}",
